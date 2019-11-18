@@ -19,7 +19,7 @@
 
 #import xlxs
 library(readxl)
-cemdata <- read.excel("cemdata.xlsx")
+cemdata <- read_excel("cemdata.xlsx")
 library(dplyr)
 alt190M <- filter(cemdata, Cohort==190, Sex=="M")
 
@@ -237,14 +237,18 @@ cohort <- (cemdata[ 1:21, 7:8]) #the object cohort is made up of the cemdata she
 plot(cohort)
 library(ggplot2)
 
-library(dplyr)
-
+###to do dual y-axis you have to scale the data first then reverse the scale on the sec_axis
 cohort_year <- mutate(cohort, year=cohort*10)
+USA_POP<- mutate(USA_POP,"popperscaled"=pop/40000)
 
-ggplot()+
-        geom_line(cohort_year, aes(x=year, y=count))+
-        geom_line(data=USA_POP, aes(x=Year, y=pop))+
-        scale_y_continuous(sec.axis = sec_axis(~.,name="USA"))
+
+ggplot(cohort_year, aes(x=year, y=count))+
+        geom_point()+
+        geom_line(data=USA_POP, aes(x=Year, y=popperscaled))+
+        scale_y_continuous(sec.axis = sec_axis(~ . * 40000, name = "USA POP scaled by 1:40000"))
+
+
+
 
 #You can plot the cohort counts with "plot(cohort)"
 #now, lets subset the cemdata. 
